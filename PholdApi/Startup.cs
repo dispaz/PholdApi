@@ -30,7 +30,6 @@ namespace PholdApi
             services.AddControllers();
             services.AddOpenApiDocument(c =>
             {
-                c.DocumentName = _docName;
                 c.Title = _docName;
                 c.Version = "V1";
             });
