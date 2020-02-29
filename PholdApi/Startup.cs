@@ -15,6 +15,8 @@ namespace PholdApi
 {
     public class Startup
     {
+
+        private const string _docName = "PholdAPI";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -26,7 +28,12 @@ namespace PholdApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddOpenApiDocument();
+            services.AddOpenApiDocument(c =>
+            {
+                c.DocumentName = _docName;
+                c.Title = _docName;
+                c.Version = "V1";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

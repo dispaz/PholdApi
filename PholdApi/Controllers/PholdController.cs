@@ -17,7 +17,13 @@ namespace PholdApi.Controllers
         {
             _logger = logger;
         }
-
+        
+        [HttpGet]
+        [Route("Get")]
+        public string GetTest()
+        {
+            return "test";
+        }
        
     }
 }
