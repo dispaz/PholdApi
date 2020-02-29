@@ -26,6 +26,7 @@ namespace PholdApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddOpenApiDocument();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,8 +37,8 @@ namespace PholdApi
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseOpenApi();
             app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();
@@ -46,6 +47,7 @@ namespace PholdApi
             {
                 endpoints.MapControllers();
             });
+            app.UseSwaggerUi3();
         }
     }
 }
