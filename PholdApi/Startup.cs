@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PholdApi.Interfaces;
+using PholdApi.Services;
 
 namespace PholdApi
 {
@@ -28,6 +30,7 @@ namespace PholdApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddScoped<IPholdStorageService, PholdStorageService>();
             services.AddOpenApiDocument(c =>
             {
                 c.Title = _docName;
@@ -42,7 +45,7 @@ namespace PholdApi
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseOpenApi();
             app.UseHttpsRedirection();
             app.UseRouting();

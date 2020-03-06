@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.File;
+using System.IO;
+using Microsoft.WindowsAzure.Storage.Blob;
+using PholdApi.Interfaces;
 
 namespace PholdApi.Controllers
 {
@@ -16,47 +19,27 @@ namespace PholdApi.Controllers
     {
         private readonly ILogger<PholdController> _logger;
         private readonly IConfiguration _config;
+        private readonly IPholdStorageService _storageService;
 
-        public PholdController(ILogger<PholdController> logger, IConfiguration config)
+        public PholdController(ILogger<PholdController> logger, IConfiguration config, IPholdStorageService storageService)
         {
             _logger = logger;
             _config = config;
+            _storageService = storageService;
         }
-        
+
+        /// <summary>
+        /// Get urls to download images
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns>List of urls to images</returns>
         [HttpGet]
-        [Route("Get")]
-        public async Task<ActionResult<string>> GetTestAsync()
+        [Route("ImagesByIds")]
+        public ActionResult<List<Uri>> GetUrlsForObjectImageByIds([FromHeader] int [] ids)
         {
-            var _connString = _config.GetSection("StorageAccountConnectionString").Value;
-            CloudStorageAccount storageAccount;
-            if(!CloudStorageAccount.TryParse(_connString, out storageAccount))
-            {
-                return StatusCode(500, "Unable to connect to storage");
-            }
-            var fileClient = storageAccount.CreateCloudFileClient();
-            var share = fileClient.GetShareReference("phold");
-            string policyName = "PholdSharePolicy" + DateTime.UtcNow.Ticks;
-            var sharedPolicy = new SharedAccessFilePolicy()
-            {
-                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(1),
-                Permissions = SharedAccessFilePermissions.Read
-            };
-
-            var permissions = await share.GetPermissionsAsync();
-
-            permissions.SharedAccessPolicies.Add(policyName, sharedPolicy);
-            await share.SetPermissionsAsync(permissions);
-
-            
-            var rootDir = share.GetRootDirectoryReference();
-            var sampleDir = rootDir.GetDirectoryReference("photos");
-            var file = sampleDir.GetFileReference("1.jpg");
-
-            var sasToken = file.GetSharedAccessSignature(null, policyName);
-            var fileSasUri = new Uri(file.StorageUri.PrimaryUri.ToString() + sasToken);
-
-            return Ok(fileSasUri);
+            //TODO logging
+            return Ok(_storageService.GetImages(ids));            
         }
-       
+
     }
 }
