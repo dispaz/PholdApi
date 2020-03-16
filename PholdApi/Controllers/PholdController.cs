@@ -11,9 +11,11 @@ using System.IO;
 using Microsoft.WindowsAzure.Storage.Blob;
 using PholdApi.Interfaces;
 using Microsoft.AspNetCore.Http;
+using PholdApi.Filters;
 
 namespace PholdApi.Controllers
 {
+    [ServiceFilter(typeof(CredentialsFilter))]
     [ApiController]
     [Route("[controller]")]
     public class PholdController : ControllerBase

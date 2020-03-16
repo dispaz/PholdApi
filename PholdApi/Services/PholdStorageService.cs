@@ -10,15 +10,13 @@ namespace PholdApi.Services
 {
     public class PholdStorageService : IPholdStorageService
     {
-        private readonly IConfiguration _config;
         private readonly string _connString;
 
         private BlobContinuationToken continuationToken = null;
 
         public PholdStorageService(IConfiguration config)
         {
-            _config = config;
-            _connString = _config.GetSection("StorageAccountConnectionString").Value;
+            _connString = config.GetSection("StorageAccountConnectionString").Value;
         }
 
         public async Task<List<Uri>> GetImagesAsync(int id)
