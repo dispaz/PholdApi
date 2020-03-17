@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using NSwag.Generation.Processors.Security;
+using Microsoft.OpenApi.Models;
 using PholdApi.Filters;
 using PholdApi.Interfaces;
 using PholdApi.Services;
@@ -37,21 +30,31 @@ namespace PholdApi
             services.AddScoped<IDbService, DbService>();
             services.AddScoped<ICredentialsService, CredentialsService>();
             
-            services.AddOpenApiDocument(c =>
+            services.AddSwaggerGen(c =>
             {
-                c.DocumentProcessors.Add(new SecurityDefinitionAppender("api-key", new NSwag.OpenApiSecurityScheme
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = _docName, Version = "v1" });
+                c.OperationFilter<SwaggerImageOperationFilter>();
+
+                c.AddSecurityDefinition("api-key", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                 {
-                    Type = NSwag.OpenApiSecuritySchemeType.ApiKey,
+                    Type = SecuritySchemeType.ApiKey,
                     Name = "api-key",
                     Description = "api-key",
-                    In = NSwag.OpenApiSecurityApiKeyLocation.Query
-                }));
+                    In = ParameterLocation.Query
+                });
 
-                c.OperationProcessors.Add(new OperationSecurityScopeProcessor("api-key"));
+                //c.OperationProcessors.Add(new OperationSecurityScopeProcessor("api-key"));
 
-                c.Title = _docName;
-                c.Version = "V1";
-
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "api-key"}
+                        },
+                        new [] {""}
+                    }
+                });
             });
             
         }
@@ -59,12 +62,6 @@ namespace PholdApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            
-            app.UseOpenApi();
             app.UseHttpsRedirection();
             app.UseRouting();
 
@@ -74,7 +71,17 @@ namespace PholdApi
             {
                 endpoints.MapControllers();
             });
-            app.UseSwaggerUi3();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", _docName);
+            });
+            
         }
     }
 }
