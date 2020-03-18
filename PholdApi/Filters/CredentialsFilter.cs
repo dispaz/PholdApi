@@ -35,6 +35,12 @@ namespace PholdApi.Filters
                     return;
                 }
             }
+            else
+            {
+                _logger.LogInformation($"action=filter msg=Api key is empty");
+                context.Result = new UnauthorizedObjectResult("Enter api key");
+                return;
+            }
             await next();
         }
     }
