@@ -12,6 +12,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using PholdApi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using PholdApi.Filters;
+using NSwag.Annotations;
 
 namespace PholdApi.Controllers
 {
@@ -62,7 +63,7 @@ namespace PholdApi.Controllers
 
         [HttpPost]
         [Route("CreateNewObject")]
-        public ActionResult<int> LoadImage([FromForm] IFormFile image)
+        public ActionResult<int> LoadImage([OpenApiFile] IFormFile image)
         {
             return StatusCodes.Status200OK;
         }
