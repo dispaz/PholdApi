@@ -12,6 +12,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using PholdApi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using PholdApi.Filters;
+using PholdApi.Models;
 using NSwag.Annotations;
 
 namespace PholdApi.Controllers
@@ -24,12 +25,14 @@ namespace PholdApi.Controllers
         private readonly ILogger<PholdController> _logger;
         private readonly IConfiguration _config;
         private readonly IPholdStorageService _storageService;
+        private readonly IDbService _dbService;
 
-        public PholdController(ILogger<PholdController> logger, IConfiguration config, IPholdStorageService storageService)
+        public PholdController(ILogger<PholdController> logger, IConfiguration config, IPholdStorageService storageService, IDbService dbService)
         {
             _logger = logger;
             _config = config;
             _storageService = storageService;
+            _dbService = dbService;
         }
 
         /// <summary>
@@ -63,8 +66,9 @@ namespace PholdApi.Controllers
 
         [HttpPost]
         [Route("CreateNewObject")]
-        public ActionResult<int> LoadImage([OpenApiFile] IFormFile image)
+        public ActionResult<int> LoadImage(PholdObject pholdObject, [OpenApiFile] IFormFile image)
         {
+            //_dbService.AddOrUpdatePholdObject()   
             return StatusCodes.Status200OK;
         }
     }
