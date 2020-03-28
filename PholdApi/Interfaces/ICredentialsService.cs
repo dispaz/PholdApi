@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace PholdApi.Interfaces
 {
-    public interface IPholdStorageService
+    public interface ICredentialsService
     {
-        Task<List<Uri>> GetImagesAsync(int id);
-
+        Task<bool> CheckApiKey(string apiKey);
     }
 }

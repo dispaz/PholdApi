@@ -10,9 +10,13 @@ using Microsoft.WindowsAzure.Storage.File;
 using System.IO;
 using Microsoft.WindowsAzure.Storage.Blob;
 using PholdApi.Interfaces;
+using Microsoft.AspNetCore.Http;
+using PholdApi.Filters;
+using NSwag.Annotations;
 
 namespace PholdApi.Controllers
 {
+    [ServiceFilter(typeof(CredentialsFilter))]
     [ApiController]
     [Route("[controller]")]
     public class PholdController : ControllerBase
@@ -31,15 +35,37 @@ namespace PholdApi.Controllers
         /// <summary>
         /// Get urls to download images
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="id"></param>
         /// <returns>List of urls to images</returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         [HttpGet]
-        [Route("ImagesByIds")]
-        public ActionResult<List<Uri>> GetUrlsForObjectImageByIds([FromHeader] int [] ids)
+        [Route("ObjectImagesById")]
+        public async Task<ActionResult<List<Uri>>> GetUrlsForObjectImageByIdsAsync(int id)
         {
             //TODO logging
-            return Ok(_storageService.GetImages(ids));            
+            try
+            {
+                var images = await _storageService.GetImagesAsync(id);
+
+                if (images.Count > 0)
+                    return Ok(images);
+                else
+                    return StatusCode(404, "Not found images for that id");
+
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
+        [HttpPost]
+        [Route("CreateNewObject")]
+        public ActionResult<int> LoadImage([OpenApiFile] IFormFile image)
+        {
+            return StatusCodes.Status200OK;
+        }
     }
 }

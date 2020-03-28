@@ -1,57 +1,57 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using PholdApi.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PholdApi.Services
 {
     public class PholdStorageService : IPholdStorageService
     {
-        IConfiguration _config;
+        private readonly string _connString;
+
+        private BlobContinuationToken continuationToken = null;
+
         public PholdStorageService(IConfiguration config)
         {
-            _config = config;
+            _connString = config.GetSection("StorageAccountConnectionString").Value;
         }
 
-        public List<Uri> GetImages(int[] ids)
+        public async Task<List<Uri>> GetImagesAsync(int id)
         {
+            CloudStorageAccount storageAccount;
+            if (!CloudStorageAccount.TryParse(_connString, out storageAccount))
+            {
+                throw new Exception("Unable to connect to storage");
+            }
 
-            var _connString = _config.GetSection("StorageAccountConnectionString").Value;
-            return new List<Uri>();
-            //var _connString = _config.GetSection("StorageAccountConnectionString").Value;
-            //CloudStorageAccount storageAccount;
-            //if (!CloudStorageAccount.TryParse(_connString, out storageAccount))
-            //{
-            //    return StatusCode(500, "Unable to connect to storage");
-            //}
+            var fileClient = storageAccount.CreateCloudBlobClient();
+            var share = fileClient.GetContainerReference("phold");
 
-            //var fileClient = storageAccount.CreateCloudBlobClient();
-            //var share = fileClient.GetContainerReference("phold");
+            var sharedPolicy = new SharedAccessBlobPolicy()
+            {
+                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(1),
+                Permissions = SharedAccessBlobPermissions.Read
+            };
 
-            //var sharedPolicy = new SharedAccessBlobPolicy()
-            //{
-            //    SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(1),
-            //    Permissions = SharedAccessBlobPermissions.Read
-            //};
+            var sasToken = share.GetSharedAccessSignature(sharedPolicy);
 
-            //var sasToken = share.GetSharedAccessSignature(sharedPolicy);
+            var rootDir = share.GetDirectoryReference("photos/" + id);
 
-            //var rootDir = share.GetDirectoryReference("photos");
+            var resultSegment = await rootDir.ListBlobsSegmentedAsync(continuationToken);
 
-            //var idList = new List<Uri>();
+            var idList = new List<Uri>();
+            foreach (var item in resultSegment.Results)
+            {
+                var fileSasUri = new Uri(item.StorageUri.PrimaryUri.ToString() + sasToken);
 
-            //foreach(var id in ids)
-            //{
-            //    var file = rootDir.GetBlobReference(id + ".jpg"); //TODO enum with image formats
+                idList.Add(fileSasUri);
 
-            //    var fileSasUri = new Uri(file.StorageUri.PrimaryUri.ToString() + sasToken);
+            }
 
-            //    idList.Add(fileSasUri);
-
-            //}
-            //return Ok(idList);
+            return idList;
         }
     }
 }
