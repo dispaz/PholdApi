@@ -58,7 +58,7 @@ namespace PholdApi.Controllers
                     return StatusCode(404, "Not found images for that id");
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
@@ -66,10 +66,18 @@ namespace PholdApi.Controllers
 
         [HttpPost]
         [Route("CreateNewObject")]
-        public ActionResult<int> LoadImage(PholdObject pholdObject, [OpenApiFile] IFormFile image)
+        public ActionResult<int> CreateNewObject([FromBody]PholdObject pholdObject)
         {
             //_dbService.AddOrUpdatePholdObject()   
             return StatusCodes.Status200OK;
+        }
+
+        [HttpPost]
+        [Route("UploadPhoto")]
+        [Consumes("multipart/form-data")]
+        public ActionResult<int> UploadPholdPhoto([SwaggerFile]IFormFile images, [FromForm]string years)
+        {
+            return Ok();
         }
     }
 }

@@ -37,7 +37,7 @@ namespace PholdApi
             services.AddScoped<IDbService, DbService>();
             services.AddScoped<ICredentialsService, CredentialsService>();
             
-            services.AddOpenApiDocument(c =>
+            services.AddSwaggerDocument(c =>
             {
                 c.DocumentProcessors.Add(new SecurityDefinitionAppender("api-key", new NSwag.OpenApiSecurityScheme
                 {
