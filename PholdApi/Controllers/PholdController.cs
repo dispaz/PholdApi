@@ -75,8 +75,9 @@ namespace PholdApi.Controllers
         [HttpPost]
         [Route("UploadPhoto")]
         [Consumes("multipart/form-data")]
-        public ActionResult<int> UploadPholdPhoto([SwaggerFile]IFormFile images, [FromForm]string years)
+        public async Task<ActionResult<int>> UploadPholdPhoto([SwaggerFile]IFormFile image, [FromForm]string years, [FromForm]int id)
         {
+            await _storageService.UploadPhotoAsync(id, image);
             return Ok();
         }
     }
