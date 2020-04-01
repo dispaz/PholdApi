@@ -9,7 +9,8 @@ namespace PholdApi.Interfaces
     public interface IDbService
     {
         Task<bool> FindApiKey(string apiKey);
-
-        int AddOrUpdatePholdObject(PholdObject pholdObject, float radius, List<Tuple<string, string>> photosInfo);
+        int AddNewPholdObject(PholdObject pholdObject, double radius);
+        void StorePhotoInfo(int id, PhotoInfo photoInfo);
+        Task<bool> PholdObjectExists(int id);
     }
 }

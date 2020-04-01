@@ -48,7 +48,7 @@ namespace PholdApi.Services
             return idList;
         }
 
-        public async Task UploadPhotoAsync(int id, IFormFile file)
+        public async Task<string> UploadPhotoAsync(int id, IFormFile file)
         {
             StringBuilder blobName = new StringBuilder(Path.GetFileName(ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"')));
             var rootDir = _container.GetDirectoryReference("photos");
@@ -77,7 +77,7 @@ namespace PholdApi.Services
             {
                 var imageBuffer = FileAsByteArray(file, imageStream);
                 await blockBlob.UploadFromByteArrayAsync(imageBuffer, 0, (int)file.Length);
-
+                return blobName.ToString();
             }
         }
 

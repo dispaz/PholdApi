@@ -26,11 +26,29 @@ namespace PholdApi.Services
             _connectionString = config.GetConnectionString("Test_PholdDb");
         }
 
-        public int AddOrUpdatePholdObject(PholdObject pholdObject, float radius, List<Tuple<string, string>> photosInfo)
+        public int AddNewPholdObject(PholdObject pholdObject, double radius)
         {
-            var query = Sql.SqlSp.CreateOrUpdatePhold;
-            var id = Execute(x => x.Execute(query, new { pholdObject, radius, PholdPhoto = DbHelper.BuildPholdPhotoInfoType(photosInfo) }));
-            return id;
+            var query = Sql.SqlSp.AddPholdObject;
+            return Execute(x => x.ExecuteScalar<int>(query, new
+            {
+                pholdObject.Name,
+                pholdObject.Street,
+                pholdObject.Latitude,
+                pholdObject.Longitude,
+                pholdObject.Description,
+                pholdObject.AreaCode,
+                radius
+            }, commandType: CommandType.StoredProcedure)); ;
+        }
+
+        public void StorePhotoInfo(int id, PhotoInfo photoInfo)
+        {
+            var query = "INSERT INTO [dbo].[PholdPhotos] ([PholdObjectID], [FileName], [Year]) VALUES (@PholdObjectID, @FileName, @Year )";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Execute(query, new { PholdObjectID = id, FileName = photoInfo.Filename, Year = photoInfo.Years });
+            }
+            
         }
 
         public async Task<bool> FindApiKey(string apiKey)
@@ -55,6 +73,19 @@ namespace PholdApi.Services
                 con.Open();
 
                 return func(con);
+            }
+        }
+
+        public async Task<bool> PholdObjectExists(int id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var result = await connection.QuerySingleOrDefaultAsync("SELECT ID FROM PholdObjects WHERE ID = @id", new { id });
+                if (result != null)
+                {
+                    return true;
+                }
+                return false;
             }
         }
     }

@@ -27,12 +27,16 @@ namespace PholdApi.Controllers
         private readonly IPholdStorageService _storageService;
         private readonly IDbService _dbService;
 
+        private double _radius;
+
         public PholdController(ILogger<PholdController> logger, IConfiguration config, IPholdStorageService storageService, IDbService dbService)
         {
             _logger = logger;
             _config = config;
             _storageService = storageService;
             _dbService = dbService;
+
+            _radius = _config.GetSection("ApplicationValues").GetValue<double>("BlockAddingRadius");
         }
 
         /// <summary>
@@ -66,19 +70,49 @@ namespace PholdApi.Controllers
 
         [HttpPost]
         [Route("CreateNewObject")]
-        public ActionResult<int> CreateNewObject([FromBody]PholdObject pholdObject)
-        {
-            //_dbService.AddOrUpdatePholdObject()   
-            return StatusCodes.Status200OK;
+        public ActionResult<int> CreateNewObject([FromForm]PholdObject pholdObject)
+        {            
+            if(_radius <= 0)
+            {
+                return StatusCode(404, "Radius is invalid");
+            }
+            return Ok(_dbService.AddNewPholdObject(pholdObject, _radius));
+            
         }
 
+        /// <summary>
+        /// Upload photo to Azure storage and store photo info in database
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="years"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         [HttpPost]
         [Route("UploadPhoto")]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<int>> UploadPholdPhoto([SwaggerFile]IFormFile image, [FromForm]string years, [FromForm]int id)
+        public async Task<ActionResult<string>> UploadPholdPhoto([SwaggerFile]IFormFile image, [FromForm]string years, [FromForm]int id)
         {
-            await _storageService.UploadPhotoAsync(id, image);
-            return Ok();
+            try
+            {
+                if (!(Path.GetExtension(image.FileName).Contains(".jpg") ||
+                    Path.GetExtension(image.FileName).Contains(".png")))
+                    return StatusCode(404, "File exstension is invalid. Only .jpg or .png");
+                
+                if(!(await _dbService.PholdObjectExists(id)))
+                    return StatusCode(404, "Phold object with that ID does not exist");
+
+                var uploadedFileName = await _storageService.UploadPhotoAsync(id, image);
+
+                _dbService.StorePhotoInfo(id, new PhotoInfo(uploadedFileName, years));
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

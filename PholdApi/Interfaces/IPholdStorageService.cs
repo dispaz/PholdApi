@@ -9,6 +9,6 @@ namespace PholdApi.Interfaces
     public interface IPholdStorageService
     {
         Task<List<Uri>> GetImagesAsync(int id);
-        Task UploadPhotoAsync(int id, IFormFile file);
+        Task<string> UploadPhotoAsync(int id, IFormFile file);
     }
 }
