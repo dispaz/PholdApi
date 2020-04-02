@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PholdApi.Models
 {
-    public class PholdObject
+    abstract public class BasePholdObject
     {
         public string Name { get; set; }
         public string Street { get; set; }
@@ -15,4 +15,13 @@ namespace PholdApi.Models
         public string AreaCode { get; set; }
 
     }
+
+    public class PholdObject : BasePholdObject
+    {
+        public string ID { get; set; }
+        
+    }
+
+    public class SavePholdObject : BasePholdObject
+    {}
 }

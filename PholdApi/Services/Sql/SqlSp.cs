@@ -9,7 +9,7 @@ namespace PholdApi.Services.Sql
     {
         public static string AddPholdObject => "dbo.spAddNewPholdObject";
         public static string AddPhotos => "dbo.spAddPhotosInfo";
-        public static string GetObjectIdsInRadius => "dbo.spGetIdsOfObjectInRadius";
+        public static string GetPholdObjects => "dbo.spGetPholdObjects";
         public static string CreateOrUpdatePhold => "dbo.spCreateOrUpdatePholdObjects";
     }
 }

@@ -26,7 +26,27 @@ namespace PholdApi.Services
             _connectionString = config.GetConnectionString("Test_PholdDb");
         }
 
-        public int AddNewPholdObject(PholdObject pholdObject, double radius)
+        public List<PholdObject> GetPholdObjects(double? latitude, double? longitude, double? radius)
+        {
+            var query = Sql.SqlSp.GetPholdObjects;
+            return Execute(x => x.Query<PholdObject>(query, new { latitude, longitude, radius }, commandType: CommandType.StoredProcedure).ToList());
+        }
+
+        public async Task<bool> FindApiKey(string apiKey)
+        {
+            _logger.LogInformation($"action=find_api_key api_key={apiKey}");
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var result = await connection.QuerySingleOrDefaultAsync<string>("SELECT Permissions FROM Credentials WHERE ApiKey = @apiKey", new { apiKey });
+                if (!string.IsNullOrEmpty(result))
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public int AddNewPholdObject(SavePholdObject pholdObject, double radius)
         {
             var query = Sql.SqlSp.AddPholdObject;
             return Execute(x => x.ExecuteScalar<int>(query, new
@@ -48,21 +68,7 @@ namespace PholdApi.Services
             {
                 connection.Execute(query, new { PholdObjectID = id, FileName = photoInfo.Filename, Year = photoInfo.Years });
             }
-            
-        }
 
-        public async Task<bool> FindApiKey(string apiKey)
-        {
-            _logger.LogInformation($"action=find_api_key api_key={apiKey}");
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var result = await connection.QuerySingleOrDefaultAsync<string>("SELECT Permissions FROM Credentials WHERE ApiKey = @apiKey", new { apiKey });
-                if(!string.IsNullOrEmpty(result))
-                {
-                    return true;
-                }
-                return false;
-            }
         }
 
         private T Execute<T>(Func<IDbConnection, T> func)
@@ -88,5 +94,6 @@ namespace PholdApi.Services
                 return false;
             }
         }
+
     }
 }

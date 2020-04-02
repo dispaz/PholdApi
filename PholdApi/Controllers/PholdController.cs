@@ -40,6 +40,28 @@ namespace PholdApi.Controllers
         }
 
         /// <summary>
+        /// Get phold objects
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>List of phold objects</returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        [HttpGet]
+        [Route("GetPholdObjects")]
+        public ActionResult<List<PholdObject>> GetPholdObjects(double? latitude, double? longitude, double? radius)
+        {
+            try
+            {
+                return Ok(_dbService.GetPholdObjects(latitude, longitude, radius));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Get urls to download images
         /// </summary>
         /// <param name="id"></param>
@@ -70,13 +92,19 @@ namespace PholdApi.Controllers
 
         [HttpPost]
         [Route("CreateNewObject")]
-        public ActionResult<int> CreateNewObject([FromForm]PholdObject pholdObject)
+        public ActionResult<int> CreateNewObject([FromForm]SavePholdObject pholdObject)
         {            
             if(_radius <= 0)
-            {
                 return StatusCode(404, "Radius is invalid");
+            
+            try
+            {
+                return Ok(_dbService.AddNewPholdObject(pholdObject, _radius));
             }
-            return Ok(_dbService.AddNewPholdObject(pholdObject, _radius));
+            catch(Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
             
         }
 
