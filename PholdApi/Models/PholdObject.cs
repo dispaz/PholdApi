@@ -18,7 +18,7 @@ namespace PholdApi.Models
 
     public class PholdObject : BasePholdObject
     {
-        public string ID { get; set; }
+        public int ID { get; set; }
         
     }
 
