@@ -32,6 +32,12 @@ namespace PholdApi.Services
             return Execute(x => x.Query<PholdObject>(query, new { latitude, longitude, radius }, commandType: CommandType.StoredProcedure).ToList());
         }
 
+        public List<PholdObject> GetPholdObjects()
+        {
+            var query = Sql.SqlSp.GetPholdObjects;
+            return Execute(x => x.Query<PholdObject>("SELECT * FROM PholdObjects").ToList());
+        }
+
         public async Task<bool> FindApiKey(string apiKey)
         {
             _logger.LogInformation($"action=find_api_key api_key={apiKey}");

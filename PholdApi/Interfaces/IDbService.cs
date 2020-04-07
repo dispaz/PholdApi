@@ -10,6 +10,7 @@ namespace PholdApi.Interfaces
     {
         Task<bool> FindApiKey(string apiKey);
         List<PholdObject> GetPholdObjects(double? latitude, double? longitude, double? radius);
+        List<PholdObject> GetPholdObjects();
         int AddNewPholdObject(SavePholdObject pholdObject, double radius);
         void StorePhotoInfo(int id, PhotoInfo photoInfo);
         Task<bool> PholdObjectExists(int id);

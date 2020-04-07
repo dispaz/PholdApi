@@ -42,7 +42,6 @@ namespace PholdApi.Controllers
         /// <summary>
         /// Get phold objects
         /// </summary>
-        /// <param name="id"></param>
         /// <returns>List of phold objects</returns>
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -54,6 +53,27 @@ namespace PholdApi.Controllers
             try
             {
                 return Ok(_dbService.GetPholdObjects(latitude, longitude, radius));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        
+        /// <summary>
+        /// Get all phold objects
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        [HttpGet]
+        [Route("GetAllPholdObjects")]
+        public ActionResult<List<PholdObject>> GetPholdObjects()
+        {
+            try
+            {
+                return Ok(_dbService.GetPholdObjects());
             }
             catch(Exception ex)
             {
