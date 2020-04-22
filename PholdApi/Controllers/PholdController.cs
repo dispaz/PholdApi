@@ -68,12 +68,17 @@ namespace PholdApi.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [HttpGet]
-        [Route("GetAllPholdObjects")]
-        public ActionResult<List<PholdObject>> GetPholdObjects()
+        [Route("get/pholds")]
+        public async Task<ActionResult<List<PholdObject>>> GetPholdObjectsAsync()
         {
             try
             {
-                return Ok(_dbService.GetPholdObjects());
+                var pholds = _dbService.GetPholdObjects();
+                foreach(var item in pholds)
+                {
+                    item.ImageUrls = await _storageService.GetImagesAsync(item.ID);
+                }
+                return Ok(pholds);
             }
             catch(Exception ex)
             {
@@ -90,8 +95,8 @@ namespace PholdApi.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [HttpGet]
-        [Route("ObjectImagesById")]
-        public async Task<ActionResult<List<Uri>>> GetUrlsForObjectImageByIdsAsync(int id)
+        [Route("get/phold/images")]
+        public async Task<ActionResult<List<string>>> GetUrlsForObjectImageByIdsAsync(int id)
         {
             //TODO logging
             try
@@ -111,7 +116,7 @@ namespace PholdApi.Controllers
         }
 
         [HttpPost]
-        [Route("CreateNewObject")]
+        [Route("post/phold")]
         public ActionResult<int> CreateNewObject([FromForm]SavePholdObject pholdObject)
         {            
             if(_radius <= 0)

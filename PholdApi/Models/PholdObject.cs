@@ -13,6 +13,7 @@ namespace PholdApi.Models
         public double Longitude { get; set; }
         public string Description { get; set; }
         public string AreaCode { get; set; }
+        public List<string> ImageUrls { get; set; }
 
     }
 

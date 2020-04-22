@@ -25,7 +25,7 @@ namespace PholdApi.Services
             _container = GetBlobContainer();
         }
 
-        public async Task<List<Uri>> GetImagesAsync(int id)
+        public async Task<List<string>> GetImagesAsync(int id)
         {
             var sharedPolicy = new SharedAccessBlobPolicy()
             {
@@ -33,19 +33,19 @@ namespace PholdApi.Services
                 Permissions = SharedAccessBlobPermissions.Read
             };
 
-            var sasToken = _container.GetSharedAccessSignature(sharedPolicy);
+            //var sasToken = _container.GetSharedAccessSignature(sharedPolicy);
             var resultSegment = await GetResultSegmentOfBlobContainer(id);
 
-            var idList = new List<Uri>();
+            var imagesOfIdList = new List<string>();
             foreach (var item in resultSegment.Results)
             {
-                var fileSasUri = new Uri(item.StorageUri.PrimaryUri.ToString() + sasToken);
+                var imageUri = item.StorageUri.PrimaryUri.ToString()/* + sasToken*/;
 
-                idList.Add(fileSasUri);
+                imagesOfIdList.Add(imageUri);
 
             }
 
-            return idList;
+            return imagesOfIdList;
         }
 
         public async Task<string> UploadPhotoAsync(int id, IFormFile file)
