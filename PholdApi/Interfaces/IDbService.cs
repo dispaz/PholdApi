@@ -14,5 +14,6 @@ namespace PholdApi.Interfaces
         int AddNewPholdObject(SavePholdObject pholdObject, double radius);
         void StorePhotoInfo(int id, PhotoInfo photoInfo);
         Task<bool> PholdObjectExists(int id);
+        List<PhotoInfo> GetPhotoInfos(int pholdId);
     }
 }

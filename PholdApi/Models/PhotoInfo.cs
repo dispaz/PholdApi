@@ -5,15 +5,24 @@ using System.Threading.Tasks;
 
 namespace PholdApi.Models
 {
-    public class PhotoInfo
+    abstract public class BasePhotoInfo
     {
-        public PhotoInfo(string filename, string years)
+        public string Year { get; set; }
+    }
+
+    public class GetPhotoInfo : BasePhotoInfo
+    {
+        public string ImageUrl { get; set; }
+    }
+
+    public class PhotoInfo : BasePhotoInfo
+    {
+        public PhotoInfo(string filename, string year)
         {
             Filename = filename;
-            Years = years;
+            Year = year;
         }
-
         public string Filename { get; set; }
-        public string Years { get; set; }
+
     }
 }

@@ -25,7 +25,7 @@ namespace PholdApi.Services
             _container = GetBlobContainer();
         }
 
-        public async Task<List<string>> GetImagesAsync(int id)
+        public async Task<List<Uri>> GetImagesAsync(int id)
         {
             var sharedPolicy = new SharedAccessBlobPolicy()
             {
@@ -36,10 +36,11 @@ namespace PholdApi.Services
             //var sasToken = _container.GetSharedAccessSignature(sharedPolicy);
             var resultSegment = await GetResultSegmentOfBlobContainer(id);
 
-            var imagesOfIdList = new List<string>();
+            var imagesOfIdList = new List<Uri>();
             foreach (var item in resultSegment.Results)
             {
-                var imageUri = item.StorageUri.PrimaryUri.ToString()/* + sasToken*/;
+                
+                var imageUri = item.StorageUri.PrimaryUri/*.ToString() + sasToken*/;
 
                 imagesOfIdList.Add(imageUri);
 

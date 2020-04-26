@@ -26,15 +26,16 @@ namespace PholdApi.Controllers
         private readonly IConfiguration _config;
         private readonly IPholdStorageService _storageService;
         private readonly IDbService _dbService;
-
+        private readonly IPholdService _pholdService;
         private double _radius;
 
-        public PholdController(ILogger<PholdController> logger, IConfiguration config, IPholdStorageService storageService, IDbService dbService)
+        public PholdController(ILogger<PholdController> logger, IConfiguration config, IPholdStorageService storageService, IDbService dbService, IPholdService pholdService)
         {
             _logger = logger;
             _config = config;
             _storageService = storageService;
             _dbService = dbService;
+            _pholdService = pholdService;
 
             _radius = _config.GetSection("ApplicationValues").GetValue<double>("BlockAddingRadius");
         }
@@ -73,11 +74,7 @@ namespace PholdApi.Controllers
         {
             try
             {
-                var pholds = _dbService.GetPholdObjects();
-                foreach(var item in pholds)
-                {
-                    item.ImageUrls = await _storageService.GetImagesAsync(item.ID);
-                }
+                var pholds = await _pholdService.GetPholdObjects();
                 return Ok(pholds);
             }
             catch(Exception ex)
@@ -141,6 +138,7 @@ namespace PholdApi.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [HttpPost]
@@ -152,7 +150,7 @@ namespace PholdApi.Controllers
             {
                 if (!(Path.GetExtension(image.FileName).Contains(".jpg") ||
                     Path.GetExtension(image.FileName).Contains(".png")))
-                    return StatusCode(404, "File exstension is invalid. Only .jpg or .png");
+                    return StatusCode(400, "File exstension is invalid. Only .jpg or .png");
                 
                 if(!(await _dbService.PholdObjectExists(id)))
                     return StatusCode(404, "Phold object with that ID does not exist");

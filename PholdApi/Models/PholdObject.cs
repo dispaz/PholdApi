@@ -19,7 +19,7 @@ namespace PholdApi.Models
     public class PholdObject : BasePholdObject
     {
         public int ID { get; set; }
-        public List<string> ImageUrls { get; set; }
+        public List<GetPhotoInfo> PhotoData { get; set; }
 
     }
 

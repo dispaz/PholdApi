@@ -26,18 +26,6 @@ namespace PholdApi.Services
             _connectionString = config.GetConnectionString("Test_PholdDb");
         }
 
-        public List<PholdObject> GetPholdObjects(double? latitude, double? longitude, double? radius)
-        {
-            var query = Sql.SqlSp.GetPholdObjects;
-            return Execute(x => x.Query<PholdObject>(query, new { latitude, longitude, radius }, commandType: CommandType.StoredProcedure).ToList());
-        }
-
-        public List<PholdObject> GetPholdObjects()
-        {
-            var query = Sql.SqlSp.GetPholdObjects;
-            return Execute(x => x.Query<PholdObject>("SELECT * FROM PholdObjects").ToList());
-        }
-
         public async Task<bool> FindApiKey(string apiKey)
         {
             _logger.LogInformation($"action=find_api_key api_key={apiKey}");
@@ -52,6 +40,24 @@ namespace PholdApi.Services
             }
         }
 
+        public List<PholdObject> GetPholdObjects(double? latitude, double? longitude, double? radius)
+        {
+            var query = Sql.SqlSp.GetPholdObjects;
+            return Execute(x => x.Query<PholdObject>(query, new { latitude, longitude, radius }, commandType: CommandType.StoredProcedure).ToList());
+        }
+
+        public List<PholdObject> GetPholdObjects()
+        {
+            return Execute(x => x.Query<PholdObject>("SELECT * FROM PholdObjects").ToList());
+        }
+
+        public List<PhotoInfo> GetPhotoInfos(int pholdId)
+        {
+            _logger.LogInformation($"action=get_photo_info phold_id={pholdId}");
+            var query = "SELECT FileName, Year FROM PholdPhotos WHERE PholdObjectID = @Id";
+            return Execute(x => x.Query<PhotoInfo>(query, new { Id = pholdId })).ToList();
+        }
+        
         public int AddNewPholdObject(SavePholdObject pholdObject, double radius)
         {
             var query = Sql.SqlSp.AddPholdObject;
@@ -64,7 +70,7 @@ namespace PholdApi.Services
                 pholdObject.Description,
                 pholdObject.AreaCode,
                 radius
-            }, commandType: CommandType.StoredProcedure)); ;
+            }, commandType: CommandType.StoredProcedure));
         }
 
         public void StorePhotoInfo(int id, PhotoInfo photoInfo)
@@ -72,7 +78,7 @@ namespace PholdApi.Services
             var query = "INSERT INTO [dbo].[PholdPhotos] ([PholdObjectID], [FileName], [Year]) VALUES (@PholdObjectID, @FileName, @Year )";
             using (var connection = new SqlConnection(_connectionString))
             {
-                connection.Execute(query, new { PholdObjectID = id, FileName = photoInfo.Filename, Year = photoInfo.Years });
+                connection.Execute(query, new { PholdObjectID = id, FileName = photoInfo.Filename, Year = photoInfo.Year });
             }
 
         }

@@ -36,7 +36,12 @@ namespace PholdApi
             services.AddScoped<IPholdStorageService, PholdStorageService>();
             services.AddScoped<IDbService, DbService>();
             services.AddScoped<ICredentialsService, CredentialsService>();
+            services.AddScoped<IPholdService, PholdService>();
             
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
+
             services.AddSwaggerDocument(c =>
             {
                 c.DocumentProcessors.Add(new SecurityDefinitionAppender("api-key", new NSwag.OpenApiSecurityScheme
