@@ -36,7 +36,7 @@ namespace PholdApi.Services
                              let fileName = HttpUtility.UrlDecode(url.Segments.Last())
                              from item in photoData
                              where item.Filename == fileName
-                             select new GetPhotoInfo() { Year = item.Year, ImageUrl = url.ToString() }
+                             select new GetPhotoInfo() { FromYear = item.FromYear, ToYear = item.ToYear, ImageUrl = url.ToString() }
                              ).ToList();
             return photoInfo;
                                           

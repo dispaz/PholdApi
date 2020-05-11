@@ -12,7 +12,7 @@ namespace PholdApi.Interfaces
         List<PholdObject> GetPholdObjects(double? latitude, double? longitude, double? radius);
         List<PholdObject> GetPholdObjects();
         int AddNewPholdObject(SavePholdObject pholdObject, double radius);
-        void StorePhotoInfo(int id, PhotoInfo photoInfo);
+        void StorePhotoInfo(PostPhotoInfo photoInfo);
         Task<bool> PholdObjectExists(int id);
         List<PhotoInfo> GetPhotoInfos(int pholdId);
     }

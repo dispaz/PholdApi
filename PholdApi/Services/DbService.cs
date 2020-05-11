@@ -54,7 +54,7 @@ namespace PholdApi.Services
         public List<PhotoInfo> GetPhotoInfos(int pholdId)
         {
             _logger.LogInformation($"action=get_photo_info phold_id={pholdId}");
-            var query = "SELECT FileName, Year FROM PholdPhotos WHERE PholdObjectID = @Id";
+            var query = "SELECT FileName, FromYear, ToYear FROM PholdPhotos WHERE PholdObjectID = @Id";
             return Execute(x => x.Query<PhotoInfo>(query, new { Id = pholdId })).ToList();
         }
         
@@ -73,12 +73,12 @@ namespace PholdApi.Services
             }, commandType: CommandType.StoredProcedure));
         }
 
-        public void StorePhotoInfo(int id, PhotoInfo photoInfo)
+        public void StorePhotoInfo(PostPhotoInfo photoInfo)
         {
-            var query = "INSERT INTO [dbo].[PholdPhotos] ([PholdObjectID], [FileName], [Year]) VALUES (@PholdObjectID, @FileName, @Year )";
+            var query = "INSERT INTO [dbo].[PholdPhotos] ([PholdObjectID], [FileName], [FromYear], [ToYear]) VALUES (@PholdObjectID, @FileName, @FromYear, @ToYear)";
             using (var connection = new SqlConnection(_connectionString))
             {
-                connection.Execute(query, new { PholdObjectID = id, FileName = photoInfo.Filename, Year = photoInfo.Year });
+                connection.Execute(query, new { PholdObjectID = photoInfo.Id, FileName = photoInfo.Filename, FromYear = photoInfo.FromYear, ToYear = photoInfo.ToYear });
             }
 
         }

@@ -39,27 +39,6 @@ namespace PholdApi.Controllers
 
             _radius = _config.GetSection("ApplicationValues").GetValue<double>("BlockAddingRadius");
         }
-
-        /// <summary>
-        /// Get phold objects
-        /// </summary>
-        /// <returns>List of phold objects</returns>
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        [HttpGet]
-        [Route("GetPholdObjects")]
-        public ActionResult<List<PholdObject>> GetPholdObjects(double? latitude, double? longitude, double? radius)
-        {
-            try
-            {
-                return Ok(_dbService.GetPholdObjects(latitude, longitude, radius));
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
         
         /// <summary>
         /// Get all phold objects
@@ -142,9 +121,9 @@ namespace PholdApi.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [HttpPost]
-        [Route("UploadPhoto")]
+        [Route("post/photoinfo")]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<string>> UploadPholdPhoto([SwaggerFile]IFormFile image, [FromForm]string years, [FromForm]int id)
+        public async Task<ActionResult<string>> UploadPholdPhoto([SwaggerFile]IFormFile image, [FromForm]PostPhotoInfo photoInfo)
         {
             try
             {
@@ -152,12 +131,12 @@ namespace PholdApi.Controllers
                     Path.GetExtension(image.FileName).Contains(".png")))
                     return StatusCode(400, "File exstension is invalid. Only .jpg or .png");
                 
-                if(!(await _dbService.PholdObjectExists(id)))
+                if(!(await _dbService.PholdObjectExists(photoInfo.Id)))
                     return StatusCode(404, "Phold object with that ID does not exist");
 
-                var uploadedFileName = await _storageService.UploadPhotoAsync(id, image);
+                var uploadedFileName = await _storageService.UploadPhotoAsync(photoInfo.Id, image);
 
-                _dbService.StorePhotoInfo(id, new PhotoInfo(uploadedFileName, years));
+                _dbService.StorePhotoInfo(photoInfo);
                 return Ok();
             }
             catch (Exception ex)

@@ -8,7 +8,6 @@ namespace PholdApi.Services.Sql
     public static class SqlSp
     {
         public static string AddPholdObject => "dbo.spAddNewPholdObject";
-        public static string AddPhotos => "dbo.spAddPhotosInfo";
         public static string GetPholdObjects => "dbo.spGetPholdObjects";
         public static string CreateOrUpdatePhold => "dbo.spCreateOrUpdatePholdObjects";
     }

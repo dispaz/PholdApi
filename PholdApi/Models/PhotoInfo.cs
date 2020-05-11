@@ -7,7 +7,8 @@ namespace PholdApi.Models
 {
     abstract public class BasePhotoInfo
     {
-        public string Year { get; set; }
+        public int? FromYear { get; set; }
+        public int? ToYear { get; set; }
     }
 
     public class GetPhotoInfo : BasePhotoInfo
@@ -15,12 +16,19 @@ namespace PholdApi.Models
         public string ImageUrl { get; set; }
     }
 
+    public class PostPhotoInfo : BasePhotoInfo
+    {
+        public int Id { get; set; }
+        public string Filename { get; set; }
+    }
+
     public class PhotoInfo : BasePhotoInfo
     {
-        public PhotoInfo(string filename, string year)
+        public PhotoInfo(string filename, int? fromYear, int? toYear)
         {
             Filename = filename;
-            Year = year;
+            FromYear = fromYear;
+            ToYear = toYear;
         }
         public string Filename { get; set; }
 
