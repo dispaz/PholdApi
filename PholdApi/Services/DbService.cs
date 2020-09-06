@@ -54,7 +54,7 @@ namespace PholdApi.Services
         public List<PhotoInfo> GetPhotoInfos(int pholdId)
         {
             _logger.LogInformation($"action=get_photo_info phold_id={pholdId}");
-            var query = "SELECT FileName, FromYear, ToYear FROM PholdPhotos WHERE PholdObjectID = @Id";
+            var query = "SELECT ID, PholdObjectID, FileName, FromYear, ToYear FROM PholdPhotos WHERE PholdObjectID = @Id";
             return Execute(x => x.Query<PhotoInfo>(query, new { Id = pholdId })).ToList();
         }
         
