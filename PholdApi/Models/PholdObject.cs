@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace PholdApi.Models
 {
-    abstract public class BasePholdObject
+    public class BasePholdObject
     {
+        public int ID { get; set; }
         public string Name { get; set; }
         public string Street { get; set; }
         public double Latitude { get; set; }
@@ -18,9 +19,19 @@ namespace PholdApi.Models
 
     public class PholdObject : BasePholdObject
     {
-        public int ID { get; set; }
-        public List<GetPhotoInfo> PhotoData { get; set; }
+        public PholdObject(BasePholdObject phold, List<GetPhotoInfo> photoInfos)
+        {
+            ID = phold.ID;
+            Name = phold.Name;
+            Street = phold.Street;
+            Latitude = phold.Latitude;
+            Longitude = phold.Longitude;
+            Description = phold.Description;
+            AreaCode = phold.AreaCode;
 
+            PhotoData = photoInfos;
+        }
+        public List<GetPhotoInfo> PhotoData { get; set; }
     }
 
     public class SavePholdObject : BasePholdObject

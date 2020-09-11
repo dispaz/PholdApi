@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PholdApi.Models
 {
-    abstract public class BasePhotoInfo
+    public class BasePhotoInfo
     {
         public int Id { get; set; }
         public int PholdObjectId { get; set; }

@@ -40,28 +40,28 @@ namespace PholdApi.Services
             }
         }
 
-        public List<PholdObject> GetPholdObjects(double? latitude, double? longitude, double? radius)
+        public async Task<List<PholdObject>> GetPholdObjectsAsync(double? latitude, double? longitude, double? radius)
         {
             var query = Sql.SqlSp.GetPholdObjects;
-            return Execute(x => x.Query<PholdObject>(query, new { latitude, longitude, radius }, commandType: CommandType.StoredProcedure).ToList());
+            return await ExecuteAsync(x => x.Query<PholdObject>(query, new { latitude, longitude, radius }, commandType: CommandType.StoredProcedure).ToList());
         }
 
-        public List<PholdObject> GetPholdObjects()
+        public async Task<List<BasePholdObject>> GetPholdObjectsAsync()
         {
-            return Execute(x => x.Query<PholdObject>("SELECT * FROM PholdObjects").ToList());
+            return await ExecuteAsync(x => x.Query<BasePholdObject>("SELECT * FROM PholdObjects").ToList());
         }
 
-        public List<PhotoInfo> GetPhotoInfos(int pholdId)
+        public async Task<List<PhotoInfo>> GetPhotoInfosAsync(int pholdId)
         {
             _logger.LogInformation($"action=get_photo_info phold_id={pholdId}");
             var query = "SELECT ID, PholdObjectID, FileName, FromYear, ToYear FROM PholdPhotos WHERE PholdObjectID = @Id";
-            return Execute(x => x.Query<PhotoInfo>(query, new { Id = pholdId })).ToList();
+            return await ExecuteAsync(x => x.Query<PhotoInfo>(query, new { Id = pholdId }).ToList());
         }
         
-        public int AddNewPholdObject(SavePholdObject pholdObject, double radius)
+        public async Task<int> AddNewPholdObjectAsync(SavePholdObject pholdObject, double radius)
         {
             var query = Sql.SqlSp.AddPholdObject;
-            return Execute(x => x.ExecuteScalar<int>(query, new
+            return await ExecuteAsync(x => x.ExecuteScalar<int>(query, new
             {
                 pholdObject.Name,
                 pholdObject.Street,
@@ -83,12 +83,12 @@ namespace PholdApi.Services
 
         }
 
-        private T Execute<T>(Func<IDbConnection, T> func)
+        private async Task<T> ExecuteAsync<T>(Func<IDbConnection, T> func)
         {
             var conString = _connectionString;
             using (var con = new SqlConnection(conString))
             {
-                con.Open();
+                await con.OpenAsync();
 
                 return func(con);
             }

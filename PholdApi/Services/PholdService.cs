@@ -19,18 +19,30 @@ namespace PholdApi.Services
             _storageService = storageService;
         }
 
-        public async Task<List<PholdObject>> GetPholdObjects()
+        public async Task<List<BasePholdObject>> GetPholdObjectsAsync()
         {
-            var pholds = _dbService.GetPholdObjects();
-            foreach (var item in pholds)
-            {
-                item.PhotoData = await GetPhotoData(item.ID);
-            }
+            var pholds = await _dbService.GetPholdObjectsAsync();
+            
             return pholds;
         }
-        private async Task<List<GetPhotoInfo>> GetPhotoData(int pholdId)
+
+        public async Task<List<PholdObject>> GetPholdObjectsWithImagesAsync()
         {
-            var photoData = _dbService.GetPhotoInfos(pholdId);
+            var pholds = await _dbService.GetPholdObjectsAsync();
+            var result = new List<PholdObject>();
+
+            foreach (var item in pholds)
+            {
+                var phold = new PholdObject(item, await GetPhotoData(item.ID));
+                result.Add(phold);
+            }
+
+            return result;
+        }
+
+        public async Task<List<GetPhotoInfo>> GetPhotoData(int pholdId)
+        {
+            var photoData = await _dbService.GetPhotoInfosAsync(pholdId);
             var pholdImagesUrls = await _storageService.GetImagesAsync(pholdId);
             var photoInfo = (from url in pholdImagesUrls
                              let fileName = HttpUtility.UrlDecode(url.Segments.Last())

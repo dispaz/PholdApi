@@ -41,6 +41,28 @@ namespace PholdApi.Controllers
         }
         
         /// <summary>
+        /// Get all phold objects with images
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        [HttpGet]
+        [Route("get/fullpholds")]
+        public async Task<ActionResult<List<PholdObject>>> GetPholdObjectsWithImagesAsync()
+        {
+            try
+            {
+                var pholds = await _pholdService.GetPholdObjectsWithImagesAsync();
+                return Ok(pholds);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Get all phold objects
         /// </summary>
         /// <returns></returns>
@@ -49,14 +71,37 @@ namespace PholdApi.Controllers
         [ProducesResponseType(500)]
         [HttpGet]
         [Route("get/pholds")]
-        public async Task<ActionResult<List<PholdObject>>> GetPholdObjectsAsync()
+        public async Task<ActionResult<List<BasePholdObject>>> GetPholdObjectsAsync()
         {
             try
             {
-                var pholds = await _pholdService.GetPholdObjects();
+                var pholds = await _pholdService.GetPholdObjectsAsync();
                 return Ok(pholds);
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get all images for phold id
+        /// </summary>
+        /// <param name="id">pholdId</param>
+        /// <returns>List of photo info with urls</returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        [HttpGet]
+        [Route("get/phold/{id}/photos")]
+        public async Task<ActionResult<List<GetPhotoInfo>>> GetPholdObjectsAsync(int id)
+        {
+            try
+            {
+                var photoInfos = await _pholdService.GetPhotoData(id);
+                return Ok(photoInfos);
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -100,7 +145,7 @@ namespace PholdApi.Controllers
             
             try
             {
-                return Ok(_dbService.AddNewPholdObject(pholdObject, _radius));
+                return Ok(_dbService.AddNewPholdObjectAsync(pholdObject, _radius));
             }
             catch(Exception e)
             {
