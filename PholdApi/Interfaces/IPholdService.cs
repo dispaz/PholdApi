@@ -1,4 +1,4 @@
-﻿using PholdApi.Models;
+﻿using PholdApi.Models.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +8,8 @@ namespace PholdApi.Interfaces
 {
     public interface IPholdService
     {
-        Task<List<PholdObject>> GetPholdObjectsWithImagesAsync();
-        Task<List<BasePholdObject>> GetPholdObjectsAsync();
+        Task<List<GetPholdObject>> GetPholdObjectsWithImagesAsync();
+        Task<List<GetPholdObject>> GetPholdObjectsAsync();
         Task<List<GetPhotoInfo>> GetPhotoData(int pholdId);
     }
 }

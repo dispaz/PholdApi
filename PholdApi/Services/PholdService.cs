@@ -1,5 +1,6 @@
 ﻿using PholdApi.Interfaces;
-using PholdApi.Models;
+using PholdApi.Models.Db;
+using PholdApi.Models.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,21 +20,20 @@ namespace PholdApi.Services
             _storageService = storageService;
         }
 
-        public async Task<List<BasePholdObject>> GetPholdObjectsAsync()
+        public async Task<List<GetPholdObject>> GetPholdObjectsAsync()
         {
             var pholds = await _dbService.GetPholdObjectsAsync();
-            
-            return pholds;
+            return pholds.Select(x => new GetPholdObject(x)).ToList();
         }
 
-        public async Task<List<PholdObject>> GetPholdObjectsWithImagesAsync()
+        public async Task<List<GetPholdObject>> GetPholdObjectsWithImagesAsync()
         {
             var pholds = await _dbService.GetPholdObjectsAsync();
-            var result = new List<PholdObject>();
+            var result = new List<GetPholdObject>();
 
             foreach (var item in pholds)
             {
-                var phold = new PholdObject(item, await GetPhotoData(item.ID));
+                var phold = new GetPholdObject(item, await GetPhotoData(item.Id));
                 result.Add(phold);
             }
 

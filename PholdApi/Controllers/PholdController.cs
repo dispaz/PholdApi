@@ -12,8 +12,9 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using PholdApi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using PholdApi.Filters;
-using PholdApi.Models;
 using NSwag.Annotations;
+using PholdApi.Models.Requests;
+using PholdApi.Models;
 
 namespace PholdApi.Controllers
 {
@@ -49,7 +50,7 @@ namespace PholdApi.Controllers
         [ProducesResponseType(500)]
         [HttpGet]
         [Route("get/fullpholds")]
-        public async Task<ActionResult<List<PholdObject>>> GetPholdObjectsWithImagesAsync()
+        public async Task<ActionResult<List<GetPholdObject>>> GetPholdObjectsWithImagesAsync()
         {
             try
             {
@@ -71,7 +72,7 @@ namespace PholdApi.Controllers
         [ProducesResponseType(500)]
         [HttpGet]
         [Route("get/pholds")]
-        public async Task<ActionResult<List<BasePholdObject>>> GetPholdObjectsAsync()
+        public async Task<ActionResult<List<GetPholdObject>>> GetPholdObjectsAsync()
         {
             try
             {
@@ -136,6 +137,11 @@ namespace PholdApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Creating new phold object
+        /// </summary>
+        /// <param name="pholdObject"></param>
+        /// <returns>Operation succeed</returns>
         [HttpPost]
         [Route("post/phold")]
         public ActionResult<int> CreateNewObject([FromForm]SavePholdObject pholdObject)
@@ -145,7 +151,16 @@ namespace PholdApi.Controllers
             
             try
             {
-                return Ok(_dbService.AddNewPholdObjectAsync(pholdObject, _radius));
+                var phold = new PostPholdObject()
+                {
+                    AreaCode = pholdObject.AreaCode,
+                    Description = pholdObject.Description,
+                    Latitude = pholdObject.Latitude,
+                    Longitude = pholdObject.Longitude,
+                    Name = pholdObject.Name,
+                    Street = pholdObject.Street
+                };
+                return Ok(_dbService.AddNewPholdObjectAsync(phold, _radius));
             }
             catch(Exception e)
             {
@@ -176,12 +191,12 @@ namespace PholdApi.Controllers
                     Path.GetExtension(image.FileName).Contains(".png")))
                     return StatusCode(400, "File exstension is invalid. Only .jpg or .png");
                 
-                if(!(await _dbService.PholdObjectExists(photoInfo.Id)))
+                if(!(await _dbService.PholdObjectExists(photoInfo.PholdObjectId)))
                     return StatusCode(404, "Phold object with that ID does not exist");
 
-                var uploadedFileName = await _storageService.UploadPhotoAsync(photoInfo.Id, image);
+                var uploadedFileName = await _storageService.UploadPhotoAsync(photoInfo.PholdObjectId, image);
 
-                _dbService.StorePhotoInfo(photoInfo);
+                _dbService.StorePhotoInfo(photoInfo, image.FileName);
                 return Ok();
             }
             catch (Exception ex)

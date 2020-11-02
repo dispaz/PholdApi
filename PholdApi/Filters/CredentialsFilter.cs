@@ -24,6 +24,7 @@ namespace PholdApi.Filters
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var request = context.HttpContext.Request;
+
             if(request.Query.ContainsKey("api-key"))
             {
                 var apiKey = request.Query["api-key"];
