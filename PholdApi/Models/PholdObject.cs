@@ -15,6 +15,4 @@ namespace PholdApi.Models
         public string AreaCode { get; set; }        
 
     }
-    public class SavePholdObject : BasePholdObject
-    { }
 }

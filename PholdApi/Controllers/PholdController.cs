@@ -144,23 +144,14 @@ namespace PholdApi.Controllers
         /// <returns>Operation succeed</returns>
         [HttpPost]
         [Route("post/phold")]
-        public ActionResult<int> CreateNewObject([FromForm]SavePholdObject pholdObject)
+        public ActionResult<int> CreateNewObject([FromBody]PostPholdObject pholdObject)
         {            
             if(_radius <= 0)
                 return StatusCode(404, "Radius is invalid");
             
             try
-            {
-                var phold = new PostPholdObject()
-                {
-                    AreaCode = pholdObject.AreaCode,
-                    Description = pholdObject.Description,
-                    Latitude = pholdObject.Latitude,
-                    Longitude = pholdObject.Longitude,
-                    Name = pholdObject.Name,
-                    Street = pholdObject.Street
-                };
-                return Ok(_dbService.AddNewPholdObjectAsync(phold, _radius));
+            {                
+                return Ok(_dbService.AddNewPholdObjectAsync(pholdObject, _radius));
             }
             catch(Exception e)
             {
