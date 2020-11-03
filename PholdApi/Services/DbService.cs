@@ -26,13 +26,13 @@ namespace PholdApi.Services
             _connectionString = config.GetConnectionString("Test_PholdDb");
         }
 
-        public async Task<bool> FindApiKey(string apiKey)
+        public async Task<bool> FindApiKey(string apiKey, string method)
         {
             _logger.LogInformation($"action=find_api_key api_key={apiKey}");
             using (var connection = new SqlConnection(_connectionString))
             {
                 var result = await connection.QuerySingleOrDefaultAsync<string>("SELECT Permissions FROM Credentials WHERE ApiKey = @apiKey", new { apiKey });
-                if (!string.IsNullOrEmpty(result))
+                if (result.Contains(method.ToLower()))
                 {
                     return true;
                 }

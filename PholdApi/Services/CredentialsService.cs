@@ -14,9 +14,9 @@ namespace PholdApi.Services
             _dbService = dbService;
         }
 
-        public async Task<bool> CheckApiKey(string apiKey)
+        public async Task<bool> CheckApiKey(string apiKey, string method)
         {
-            return await _dbService.FindApiKey(apiKey);
+            return await _dbService.FindApiKey(apiKey, method);
         }
     }
 }

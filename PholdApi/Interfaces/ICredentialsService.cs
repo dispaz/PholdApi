@@ -7,6 +7,6 @@ namespace PholdApi.Interfaces
 {
     public interface ICredentialsService
     {
-        Task<bool> CheckApiKey(string apiKey);
+        Task<bool> CheckApiKey(string apiKey, string method);
     }
 }

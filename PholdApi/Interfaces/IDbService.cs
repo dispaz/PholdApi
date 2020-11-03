@@ -9,7 +9,7 @@ namespace PholdApi.Interfaces
 {
     public interface IDbService
     {
-        Task<bool> FindApiKey(string apiKey);
+        Task<bool> FindApiKey(string apiKey, string method);
         Task<List<PholdObjectDb>> GetPholdObjectsAsync(double? latitude, double? longitude, double? radius);
         Task<List<PholdObjectDb>> GetPholdObjectsAsync();
         Task<int> AddNewPholdObjectAsync(PostPholdObject pholdObject, double radius);
