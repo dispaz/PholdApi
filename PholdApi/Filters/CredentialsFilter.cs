@@ -24,10 +24,11 @@ namespace PholdApi.Filters
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var request = context.HttpContext.Request;
+            var method = request.Method;
             if(request.Query.ContainsKey("api-key"))
             {
                 var apiKey = request.Query["api-key"];
-                var isKeyValid = await _credentialsService.CheckApiKey(apiKey);
+                var isKeyValid = await _credentialsService.CheckApiKey(apiKey, method);
                 if (!isKeyValid)
                 {
                     _logger.LogInformation($"action=filter api-key={apiKey} msg=Invalid api key");

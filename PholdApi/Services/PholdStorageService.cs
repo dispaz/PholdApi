@@ -73,7 +73,6 @@ namespace PholdApi.Services
             // TO DO REFACTOR ---------------------------------------
             blockBlob.Properties.ContentType = file.ContentType;
             
-
             using (var imageStream = file.OpenReadStream())
             {
                 var imageBuffer = FileAsByteArray(file, imageStream);

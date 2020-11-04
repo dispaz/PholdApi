@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,33 +8,20 @@ namespace PholdApi.Models
 {
     public class BasePholdObject
     {
-        public int ID { get; set; }
+        [Required(AllowEmptyStrings = false)]
         public string Name { get; set; }
+        [Required(AllowEmptyStrings = false)]
         public string Street { get; set; }
+        [Required]
+        [Range(-90.0, 90.0)]
         public double Latitude { get; set; }
+        [Required]
+        [Range(-180.0, 180.0)]
         public double Longitude { get; set; }
+        [Required(AllowEmptyStrings = false)]
         public string Description { get; set; }
+        [Required(AllowEmptyStrings = false)]
         public string AreaCode { get; set; }        
 
     }
-
-    public class PholdObject : BasePholdObject
-    {
-        public PholdObject(BasePholdObject phold, List<GetPhotoInfo> photoInfos)
-        {
-            ID = phold.ID;
-            Name = phold.Name;
-            Street = phold.Street;
-            Latitude = phold.Latitude;
-            Longitude = phold.Longitude;
-            Description = phold.Description;
-            AreaCode = phold.AreaCode;
-
-            PhotoData = photoInfos;
-        }
-        public List<GetPhotoInfo> PhotoData { get; set; }
-    }
-
-    public class SavePholdObject : BasePholdObject
-    {}
 }

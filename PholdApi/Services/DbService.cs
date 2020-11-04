@@ -8,9 +8,9 @@ using System.Linq;
 using Dapper;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
-using PholdApi.Models;
 using System.Data;
-using PholdApi.Helpers;
+using PholdApi.Models.Db;
+using PholdApi.Models.Requests;
 
 namespace PholdApi.Services
 {
@@ -26,13 +26,13 @@ namespace PholdApi.Services
             _connectionString = config.GetConnectionString("Test_PholdDb");
         }
 
-        public async Task<bool> FindApiKey(string apiKey)
+        public async Task<bool> FindApiKey(string apiKey, string method)
         {
             _logger.LogInformation($"action=find_api_key api_key={apiKey}");
             using (var connection = new SqlConnection(_connectionString))
             {
                 var result = await connection.QuerySingleOrDefaultAsync<string>("SELECT Permissions FROM Credentials WHERE ApiKey = @apiKey", new { apiKey });
-                if (!string.IsNullOrEmpty(result))
+                if (result.Contains(method.ToLower()))
                 {
                     return true;
                 }
@@ -40,25 +40,25 @@ namespace PholdApi.Services
             }
         }
 
-        public async Task<List<PholdObject>> GetPholdObjectsAsync(double? latitude, double? longitude, double? radius)
+        public async Task<List<PholdObjectDb>> GetPholdObjectsAsync(double? latitude, double? longitude, double? radius)
         {
             var query = Sql.SqlSp.GetPholdObjects;
-            return await ExecuteAsync(x => x.Query<PholdObject>(query, new { latitude, longitude, radius }, commandType: CommandType.StoredProcedure).ToList());
+            return await ExecuteAsync(x => x.Query<PholdObjectDb>(query, new { latitude, longitude, radius }, commandType: CommandType.StoredProcedure).ToList());
         }
 
-        public async Task<List<BasePholdObject>> GetPholdObjectsAsync()
+        public async Task<List<PholdObjectDb>> GetPholdObjectsAsync()
         {
-            return await ExecuteAsync(x => x.Query<BasePholdObject>("SELECT * FROM PholdObjects").ToList());
+            return await ExecuteAsync(x => x.Query<PholdObjectDb>("SELECT * FROM PholdObjects").ToList());
         }
 
-        public async Task<List<PhotoInfo>> GetPhotoInfosAsync(int pholdId)
+        public async Task<List<PhotoInfoDb>> GetPhotoInfosAsync(int pholdId)
         {
             _logger.LogInformation($"action=get_photo_info phold_id={pholdId}");
             var query = "SELECT ID, PholdObjectID, FileName, FromYear, ToYear FROM PholdPhotos WHERE PholdObjectID = @Id";
-            return await ExecuteAsync(x => x.Query<PhotoInfo>(query, new { Id = pholdId }).ToList());
+            return await ExecuteAsync(x => x.Query<PhotoInfoDb>(query, new { Id = pholdId }).ToList());
         }
         
-        public async Task<int> AddNewPholdObjectAsync(SavePholdObject pholdObject, double radius)
+        public async Task<int> AddNewPholdObjectAsync(PostPholdObject pholdObject, double radius)
         {
             var query = Sql.SqlSp.AddPholdObject;
             return await ExecuteAsync(x => x.ExecuteScalar<int>(query, new
@@ -73,12 +73,12 @@ namespace PholdApi.Services
             }, commandType: CommandType.StoredProcedure));
         }
 
-        public void StorePhotoInfo(PostPhotoInfo photoInfo)
+        public void StorePhotoInfo(PostPhotoInfo photoInfo, string filename)
         {
             var query = "INSERT INTO [dbo].[PholdPhotos] ([PholdObjectID], [FileName], [FromYear], [ToYear]) VALUES (@PholdObjectID, @FileName, @FromYear, @ToYear)";
             using (var connection = new SqlConnection(_connectionString))
             {
-                connection.Execute(query, new { PholdObjectID = photoInfo.Id, FileName = photoInfo.Filename, FromYear = photoInfo.FromYear, ToYear = photoInfo.ToYear });
+                connection.Execute(query, new { PholdObjectID = photoInfo.PholdObjectId, FileName = filename, FromYear = photoInfo.FromYear, ToYear = photoInfo.ToYear });
             }
 
         }
